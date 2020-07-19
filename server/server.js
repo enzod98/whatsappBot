@@ -1,7 +1,9 @@
 
-const { Client } = require('whatsapp-web.js');
 const fs = require('fs');
-const client = require('../controllers/funciones');
+
+const { Client } = require('whatsapp-web.js');
+const client = require('../controllers/acciones');
+
 
 client.initialize();
 
