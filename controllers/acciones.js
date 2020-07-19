@@ -10,10 +10,6 @@ const getClima = require('./climaController').getClima;
 
 client.on('ready', () => {
     console.log('Conexión realizada con éxito!');
-    /*setInterval(() => {
-        client.sendMessage(`123456789@c.us`, "I'm alive");
-        console.log('mensaje enviado');
-    }, 60000);*/
 
 });
 
@@ -36,35 +32,31 @@ client.on('message', message => {
 
                 console.log("Mensaje: ", message.body);
 
+
+                var listaComandos = ["buscar", "clima"];
+
                 //descomponemos el mensaje para detectar el comando y la consulta
                 let mensajeDescompuesto = message.body.split(' ');
                 let comandoIngresado = mensajeDescompuesto[0].toLocaleLowerCase();
+
+                if (listaComandos.indexOf(comandoIngresado) < 0) {
+                    enviarComandos(message.from);
+                }
 
                 //borramos del array el primer elemento que vendría a ser el comando
                 mensajeDescompuesto.splice(0, 1);
                 let consulta = mensajeDescompuesto.join(' ');
                 consulta = encodeURI(consulta);
-                /*let consulta = "";
-                for (var i = 1; i < mensajeDescompuesto.length; i++) {
-                    consulta += mensajeDescompuesto[i];
-                    if (i != mensajeDescompuesto.length - 1) {
-                        consulta += " ";
-                    }
-                }*/
 
                 switch (comandoIngresado) {
                     case "buscar":
                         getBusqueda(message.from, consulta);
-                        //client.sendMessage(message.from, 'Quieres hacer una busqueda parece');
                         break;
 
                     case "clima":
                         getClima(message.from, consulta);
                         break;
 
-                    default:
-                        client.sendMessage(message.from, 'Comandos:\nBuscar: realiza una búsqueda rápida en internet\nClima: Realiza la búsqueda del clima de la ciudad solicitada');
-                        break;
                 }
             }
 
@@ -72,27 +64,24 @@ client.on('message', message => {
         .catch(error => {
             console.log(error);
         });
-
-    /*if(message.from.split('-').length <= 1 ){
-        console.log("¡NUEVO MENSAJE PRIVADO!");
-    } else{
-        console.log("¡NUEVO MENSAJE DE GRUPO!");
-    }*/
-
-    let mensajeInt = parseInt(message.body, 10);
-
-    if (mensajeInt >= 0 && mensajeInt <= 10) {
-        client.sendMessage(message.from, 'Gracias por participar de la encuesta!');
-    }
 });
 
 
 //acciones que se realizarán al ingresar a un grupo
 client.on('group_join', data => {
     //el data es de tipo GroupNotification
-    client.sendMessage(data.id.remote, 'Hola mundo!')
+    //client.sendMessage(data.id.remote, 'Hola mundo!');
+    enviarComandos(data.id.remote);
 
 });
+
+
+function enviarComandos(emisor){
+    client.sendMessage(emisor,
+        "\t======LISTA DE COMANDOS======\n\n" +
+        "Buscar: Realiza una búsqueda rápida en internet\nEjemplo: 'Buscar Fallout'\n\n" +
+        "Clima: Realiza la búsqueda del clima de la ciudad solicitada\nEjemplo: 'Clima Asuncion'");
+}
 
 
 module.exports = client;
