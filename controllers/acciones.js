@@ -4,7 +4,9 @@ const { Client } = require('whatsapp-web.js');
 
 const client = require('./conexionWhatsapp');
 
-const obtenerBusqueda = require('./buscadorController');
+const getBusqueda = require('./buscadorController');
+
+const getClima = require('./climaController').getClima;
 
 client.on('ready', () => {
     console.log('Conexión realizada con éxito!');
@@ -41,7 +43,7 @@ client.on('message', message => {
                 //borramos del array el primer elemento que vendría a ser el comando
                 mensajeDescompuesto.splice(0, 1);
                 let consulta = mensajeDescompuesto.join(' ');
-
+                consulta = encodeURI(consulta);
                 /*let consulta = "";
                 for (var i = 1; i < mensajeDescompuesto.length; i++) {
                     consulta += mensajeDescompuesto[i];
@@ -52,18 +54,16 @@ client.on('message', message => {
 
                 switch (comandoIngresado) {
                     case "buscar":
-                        let result = obtenerBusqueda(consulta);
-                        result.then(resultado => {
-                            client.sendMessage(message.from, resultado.AbstractText);
-                            return;
-                        }).catch(error => {
-
-                        });
+                        getBusqueda(message.from, consulta);
                         //client.sendMessage(message.from, 'Quieres hacer una busqueda parece');
                         break;
 
+                    case "clima":
+                        getClima(message.from, consulta);
+                        break;
+
                     default:
-                        client.sendMessage(message.from, 'Comandos: \n buscar: realiza una búsqueda rápida en internet');
+                        client.sendMessage(message.from, 'Comandos:\nBuscar: realiza una búsqueda rápida en internet\nClima: Realiza la búsqueda del clima de la ciudad solicitada');
                         break;
                 }
             }
