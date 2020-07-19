@@ -2,7 +2,9 @@ const fs = require('fs');
 
 const { Client } = require('whatsapp-web.js');
 
-const client = require('./conexionWhatsapp'); 
+const client = require('./conexionWhatsapp');
+
+const { obtenerBusqueda } = require('./buscadorController');
 
 client.on('ready', () => {
     console.log('Conexión realizada con éxito!');
@@ -31,6 +33,12 @@ client.on('message', message => {
             console.log("========================");
 
             console.log("Mensaje: ", message.body);
+
+            if(message.body.split(' ')[0] === ('buscar')){
+                //let busqueda = obtenerBusqueda( message.body );
+                client.sendMessage(message.from, 'Quieres hacer una busqueda parece')
+            }
+
         })
         .catch(error => {
             console.log(error);
