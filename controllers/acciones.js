@@ -4,7 +4,7 @@ const { Client } = require('whatsapp-web.js');
 
 const client = require('./conexionWhatsapp');
 
-const { obtenerBusqueda } = require('./buscadorController');
+const obtenerBusqueda = require('./buscadorController');
 
 client.on('ready', () => {
     console.log('Conexión realizada con éxito!');
@@ -21,25 +21,54 @@ client.on('message', message => {
     message.getChat()
         .then(promesaChat => promesaChat)
         .then(chat => {
-            var remitente = chat.name;
-            console.log("\n========================");
-            //console.log(chat);
-            if (chat.isGroup) {
-                console.log(`¡NUEVO MENSAJE DEL GRUPO ${remitente.toUpperCase()} !`);
+                var remitente = chat.name;
+                console.log("\n========================");
+                //console.log(chat);
+                if (chat.isGroup) {
+                    console.log(`¡NUEVO MENSAJE DEL GRUPO ${remitente.toUpperCase()} !`);
 
-            } else {
-                console.log(`¡NUEVO MENSAJE PRIVADO DE ${remitente.toUpperCase()} !`);
+                } else {
+                    console.log(`¡NUEVO MENSAJE PRIVADO DE ${remitente.toUpperCase()} !`);
+                }
+                console.log("========================");
+
+                console.log("Mensaje: ", message.body);
+
+                //descomponemos el mensaje para detectar el comando y la consulta
+                let mensajeDescompuesto = message.body.split(' ');
+                let comandoIngresado = mensajeDescompuesto[0].toLocaleLowerCase();
+
+                //borramos del array el primer elemento que vendría a ser el comando
+                mensajeDescompuesto.splice(0, 1);
+                let consulta = mensajeDescompuesto.join(' ');
+
+                /*let consulta = "";
+                for (var i = 1; i < mensajeDescompuesto.length; i++) {
+                    consulta += mensajeDescompuesto[i];
+                    if (i != mensajeDescompuesto.length - 1) {
+                        consulta += " ";
+                    }
+                }*/
+
+                switch (comandoIngresado) {
+                    case "buscar":
+                        let result = obtenerBusqueda(consulta);
+                        result.then(resultado => {
+                            client.sendMessage(message.from, resultado.AbstractText);
+                            return;
+                        }).catch(error => {
+
+                        });
+                        //client.sendMessage(message.from, 'Quieres hacer una busqueda parece');
+                        break;
+
+                    default:
+                        client.sendMessage(message.from, 'Comandos: \n buscar: realiza una búsqueda rápida en internet');
+                        break;
+                }
             }
-            console.log("========================");
 
-            console.log("Mensaje: ", message.body);
-
-            if(message.body.split(' ')[0] === ('buscar')){
-                //let busqueda = obtenerBusqueda( message.body );
-                client.sendMessage(message.from, 'Quieres hacer una busqueda parece')
-            }
-
-        })
+        )
         .catch(error => {
             console.log(error);
         });
@@ -49,7 +78,7 @@ client.on('message', message => {
     } else{
         console.log("¡NUEVO MENSAJE DE GRUPO!");
     }*/
-    
+
     let mensajeInt = parseInt(message.body, 10);
 
     if (mensajeInt >= 0 && mensajeInt <= 10) {
